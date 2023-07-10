@@ -9,7 +9,8 @@ member_handler(Members) ->
 	receive
 		{addMember, New_member} ->
 			io:fwrite("Member ~p added.~n", [New_member]),
-			member_handler([New_member] ++ Members);
+			%member_handler([New_member] ++ Members);
+			member_handler(New_member);
 		{getMembers, PID} ->
 			PID ! {allMembers, Members},
 			member_handler(Members);
@@ -37,5 +38,5 @@ handle_cast({out_msg, Message, Name}, _State) ->
 			ok
 	end,
 	io:fwrite("~p~n", [Member_list]),
-	%{noreply, 1}.
-	gen_server:cast(Member_list, {in_msg, Message, Name}). % Does not work yet
+	gen_server:cast(element(1, Member_list), {in_msg, Message, Name}),
+	{noreply, 1}.
