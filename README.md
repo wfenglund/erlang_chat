@@ -18,7 +18,11 @@ $ erl -sname client_session -setcookie chat
 ```erlang
 1> c(client_module).
 2> net_adm:ping('server_session@manjw'). % Change manjw to the name of your computer
-3> client_module:start_client("hello").
+3> client_module:start_client("William"). % Enter chat with your name
+4> client_module:send_message("Hello").
 ```
 
-At the moment this prints out an error, but it does indeed also deliver the message to the server as well as receives the response of the server.
+The server then receives the message and sends it back to the client where it is printed like this:
+```
+"William" : "Hello"
+```
