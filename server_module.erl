@@ -1,7 +1,7 @@
 -module(server_module).
 -author("William Englund").
 -behaviour(gen_server).
--export([member_handler/1, start_server/0, init/1]).
+-export([member_handler/1, start_server/0, init/1, broadcast_message/2]).
 -export([handle_call/3, handle_cast/2]).
 -define(STORAGE, storage).
 
@@ -9,8 +9,7 @@ member_handler(Members) ->
 	receive
 		{addMember, New_member} ->
 			io:fwrite("Member ~p added.~n", [New_member]),
-			%member_handler([New_member] ++ Members);
-			member_handler(New_member);
+			member_handler([New_member] ++ Members);
 		{getMembers, PID} ->
 			PID ! {allMembers, Members},
 			member_handler(Members);
@@ -26,17 +25,23 @@ start_server() ->
 init([]) ->
 	{ok, 1}.
 
-handle_call({memberId, Name}, From, State) -> % Receive messages that are sent by call() in client
-	io:fwrite("~p~n", [Name]),
-	whereis(?STORAGE) ! {addMember, From},
-	{reply, {confirmation, Name}, State}. % Reply back to client
-
-handle_cast({out_msg, Message, Name}, _State) ->
+broadcast_message(Message, From) ->
 	whereis(?STORAGE) ! {getMembers, self()},
 	receive
 		{allMembers, Member_list} ->
 			ok
 	end,
-	io:fwrite("~p~n", [Member_list]),
-	gen_server:cast(element(1, Member_list), {in_msg, Message, Name}),
+	io:fwrite("Current members: ~p~n", [Member_list]),
+	lists:foreach(fun(X) -> gen_server:cast(X, {in_msg, Message, From}) end, Member_list).
+
+handle_call({memberId, Name}, From, State) -> % Receive messages from call() in client
+	io:fwrite("~p~n", [Name]),
+	{Address, _} = From,
+	whereis(?STORAGE) ! {addMember, Address},
+	Message = Name ++ " has joined the chat.",
+	broadcast_message(Message, "SERVER"), % Notify all members that member has joined
+	{reply, {confirmation}, State}. % Reply with confirmation to client
+
+handle_cast({out_msg, Message, Name}, _State) -> % Receive messages from cast() in client
+	broadcast_message(Message, Name), % Send message to all members of the chat
 	{noreply, 1}.
