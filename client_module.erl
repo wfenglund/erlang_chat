@@ -21,8 +21,8 @@ start_client(Name) ->
 
 init([{name, Name}]) -> % Make a synchronous call to server to join the chat
 	case gen_server:call({global, server_module}, {memberId, Name}) of % Send a message to server
-		{confirmation, Message} ->
-			io:fwrite("~p has joined the chat~n", [Message]); % Print the message that server sends back
+		{confirmation} ->
+			io:fwrite("Welcome to the chat ~p.~n", [Name]); % Print the message that server sends back
 		{error, Reason} ->
 			io:fwrite("Stopping because of error, reason: ~p~n", [Reason])
 	end,
