@@ -26,9 +26,9 @@ And and in the third terminal (chat client 2):
 $ erl -sname client_session2 -setcookie chat
 ```
 ```erlang
-2> net_adm:ping('server_session@manjw'). % Change manjw to the name of your computer
-3> client_module:start_client("Elias"). % Enter chat with your name
-4> client_module:send_message("Hello").
+1> net_adm:ping('server_session@manjw'). % Change manjw to the name of your computer
+2> client_module:start_client("Elias"). % Enter chat with your name
+3> client_module:send_message("Hello").
 ```
 
 The output will then be the following in chat client 1:
