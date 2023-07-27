@@ -1,7 +1,7 @@
 # erlang_chat
 Experimenting with building a simple chat client in erlang.
 
-Current usage (example):
+## Current usage
 Start three terminals and navigate to the folder containing the erlang scripts and do the following in the first one (chat server):
 ```bash
 $ erl -sname server_session -setcookie chat
